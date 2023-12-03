@@ -32,5 +32,8 @@
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "express-oauth2-jwt-bearer": "^1.6.0"
   }
 }
