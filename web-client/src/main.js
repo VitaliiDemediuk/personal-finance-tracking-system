@@ -19,7 +19,8 @@ app
       clientId: authConfig.clientId,
       authorizationParams: {
         redirect_uri: window.location.origin,
-      }
+        audience: "pfts_main_back_end"
+      }      
     })
   )
   .mount("#app");
