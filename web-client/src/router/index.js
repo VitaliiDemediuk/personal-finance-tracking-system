@@ -1,20 +1,20 @@
 // Composables
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter as createVueRouter, createWebHashHistory } from "vue-router";
+import { createAuthGuard } from "@auth0/auth0-vue";
 
-const routes = [
-  {
-    path: '/',
-    component: () => import('@/views/Home.vue')
-  },
-  {
-    path: '/home',
-    component: () => import('@/views/Home.vue')
-  },
-]
-
-const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes,
-})
-
-export default router
+export function createRouter(app) {
+  return createVueRouter({
+    routes: [
+      {
+        path: '/',
+        component: () => import('@/views/Home.vue')
+      },
+      {
+        path: '/home',
+        component: () => import('@/views/Home.vue'),
+        beforeEnter: createAuthGuard(app)
+      },
+    ],
+    history: createWebHashHistory()
+  })
+}
