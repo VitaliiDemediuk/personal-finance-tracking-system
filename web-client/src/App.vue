@@ -1,17 +1,30 @@
 <template>
-  <v-app>
-    
+    <v-app>
+      
     <AppBar />
-    
+    <div v-if="isAuthenticated.value">
     <SideBar />
 
     <v-main class="d-flex align-center justify-center">
       <router-view />
-    </v-main> 
+    </v-main>
+    </div>
+    <div v-else>
+      <v-main class="d-flex align-center justify-center">
+        <div class="text-center">
+          <h1 class="display-1">Welcome to the Personal Finance Tracking System</h1>
+          <p class="subheading">Please log in to continue</p>
+        </div>
+      </v-main>
+    </div>
   </v-app>
 </template>
 
 <script setup>
   import SideBar from './layouts/SideBar.vue'
   import AppBar from './layouts/AppBar.vue'
+  import { useAuth0 } from '@auth0/auth0-vue';
+
+  const { isAuthenticated } = useAuth0();
+  console.log(isAuthenticated.value)
 </script>
