@@ -2,13 +2,13 @@
     <v-app>
       
     <AppBar />
-    <div v-if="isAuthenticated.value">
-    <SideBar />
+    <div v-if="isAuthenticated || isLoading">
+      <SideBar />
 
-    <v-main class="d-flex align-center justify-center">
-      <router-view />
-    </v-main>
-    </div>
+      <v-main class="d-flex align-center justify-center">
+        <router-view />
+      </v-main>
+      </div>
     <div v-else>
       <v-main class="d-flex align-center justify-center">
         <div class="text-center">
@@ -23,8 +23,10 @@
 <script setup>
   import SideBar from './layouts/SideBar.vue'
   import AppBar from './layouts/AppBar.vue'
-  import { useAuth0 } from '@auth0/auth0-vue';
 
-  const { isAuthenticated } = useAuth0();
-  console.log(isAuthenticated.value)
+  import { useAuth0 } from '@auth0/auth0-vue';
+  const auth0 = useAuth0();
+
+  const isAuthenticated = auth0.isAuthenticated
+  const isLoading = auth0.isLoading
 </script>

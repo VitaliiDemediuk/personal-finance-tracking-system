@@ -5,9 +5,9 @@
       >
         <v-list>
           <v-list-item
-            prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
-            title="Sandra Adams"
-            subtitle="sandra_a88@gmailcom"
+            :prepend-avatar="user.picture"
+            :title="user.name"
+            :subtitle="user.email"
           ></v-list-item>
         </v-list>
 
@@ -21,3 +21,18 @@
         </v-list>
       </v-navigation-drawer>
 </template>
+
+<script>
+import { useAuth0 } from '@auth0/auth0-vue';
+
+export default {
+  name: "SideBar",
+  setup() {
+    const auth0 = useAuth0();
+    
+    return {
+      user: auth0.user,
+    }
+  }
+};
+</script>
