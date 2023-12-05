@@ -6,6 +6,7 @@
       <SideBar />
 
       <v-main class="d-flex align-center justify-center">
+        <div>{{ recData }}</div>
         <router-view />
       </v-main>
       </div>
@@ -21,8 +22,10 @@
 </template>
 
 <script setup>
-  import SideBar from './layouts/SideBar.vue'
-  import AppBar from './layouts/AppBar.vue'
+  import SideBar from './components/SideBar.vue'
+  import AppBar from './components/AppBar.vue'
+  import { useFetch } from '@vueuse/core'
+  import { ref } from 'vue'
 
   import { useAuth0 } from '@auth0/auth0-vue';
   const auth0 = useAuth0();

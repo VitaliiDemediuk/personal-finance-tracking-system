@@ -14,6 +14,11 @@ export function createRouter(app) {
         component: () => import('@/views/Home.vue'),
         beforeEnter: createAuthGuard(app)
       },
+      {
+        path: '/categories',
+        component: () => import('@/views/Categories.vue'),
+        beforeEnter: createAuthGuard(app)
+      },
     ],
     history: createWebHashHistory()
   })
