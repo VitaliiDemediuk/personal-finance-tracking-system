@@ -10,9 +10,12 @@ generator client {
 model Category {
   id            Int          @id @default(autoincrement())
   name          String
+  type          Int    // Replaced enum with Int. 0 = expense, 1 = income
   description   String?
   transactions  Transaction[]
-  userId        String
+  user_id        String
+
+  @@unique([name, user_id])
 }
 
 model Transaction {
@@ -23,14 +26,17 @@ model Transaction {
   description   String?
   categoryId    Int?
   category      Category?  @relation(fields: [categoryId], references: [id])
-  userId        String
+  user_id        String
 }
 
 model Report {
   id            Int     @id @default(autoincrement())
+  name          String
   createdOn     DateTime
   periodStart   DateTime
   periodEnd     DateTime
   type          Int     // Replaced enum with Int. 0 = expense, 1 = income
-  userId        String
+  user_id        String
+
+  @@unique([name, user_id])
 }
