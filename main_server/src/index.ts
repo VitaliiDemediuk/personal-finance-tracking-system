@@ -13,6 +13,40 @@ app.use(bodyParser.json())
 
 const port = 8081
 
+const categoryTypesInt: { [key: string]: number} = {
+    expense: 0,
+    income: 1,
+};
+
+const getTypeString = (typeInt: number) => {
+    const categoryTypesStr: { [key: number]: string } = {
+        0: 'expense',
+        1: 'income',
+    };
+    return categoryTypesStr[typeInt] || 'unknown';
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cleanData = (data: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cleanObject = (obj: any) => {
+        // Remove userId and convert type
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { user_id, type, ...rest } = obj;
+        const cleanedData = { ...rest, type: getTypeString(type) };
+
+        // Remove null values
+        return Object.fromEntries(
+            Object.entries(cleanedData).filter(([_, value]) => value !== null)
+        );
+    };
+
+    // Check if the data is an array and apply cleanObject to each element
+    return Array.isArray(data) ? data.map(cleanObject) : cleanObject(data);
+};
+
+
+
 const getUserId = (auth: AuthResult | undefined) => {
     if (auth === undefined) {
         throw new Error('Auth is undefined');
@@ -25,20 +59,6 @@ const getUserId = (auth: AuthResult | undefined) => {
 
     return sub as string;
 };
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const removeUserId = (data: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const selectUsefull = (data: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { user_id, ...rest } = data;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const cleanedData = Object.fromEntries(Object.entries(rest).filter(([key, value]) => value !== null));
-        return cleanedData;
-    };
-
-    return Array.isArray(data) ? data.map(selectUsefull) : selectUsefull(data);
-}
 
 const handleError = (error: unknown, response: Response) => {
     if (error instanceof Error) {
@@ -62,7 +82,7 @@ categoryRouter.get('/all', checkJwt, async (request, response) => {
         const userId = getUserId(request.auth);
 
         const categories = await prisma.category.findMany( {where: { user_id: userId }});
-        response.json(removeUserId(categories));
+        response.json(cleanData(categories));
     } catch (error) {
         handleError(error, response);
     }
@@ -78,7 +98,7 @@ categoryRouter.get('/:id', checkJwt, async (request, response) => {
             where: { id, user_id: userId },
         });
         if (category) {
-            response.json(removeUserId(category));
+            response.json(cleanData(category));
         } else {
             response.status(404).send('Category not found');
         }
@@ -92,16 +112,22 @@ categoryRouter.post('', checkJwt, async (request, response) => {
     try {
         const userId = getUserId(request.auth);
 
-        console.log(request.query);
-        const { name, description } = request.body;
+        const { name, description, type } = request.body;
+        // Convert type string to its corresponding integer
+        const typeInt = categoryTypesInt[type];
+        if (typeInt === undefined) {
+            return response.status(400).send('Invalid category type');
+        }
+
         const category = await prisma.category.create({
-            data: { name, description, user_id: userId },
+            data: { name, description, type: typeInt, user_id: userId },
         });
-        response.json(removeUserId(category));
+        response.json(cleanData(category));
     } catch (error) {
         handleError(error, response);
     }
-  });
+});
+
 
 // PUT: Update a category
 categoryRouter.put('/:id', checkJwt, async (request, response) => {
@@ -114,7 +140,7 @@ try {
         where: { id, user_id: userId },
         data: { name, description },
     });
-    response.json(removeUserId(category));
+    response.json(cleanData(category));
 } catch (error) {
     handleError(error, response);
 }
