@@ -10,5 +10,5 @@ export const getTypeString = (typeInt: number) => {
         case typesInt.income:
             return 'income';
     }
-    return typesStr[typeInt] || 'unknown';
+    return 'unknown';
 };
