@@ -8,7 +8,7 @@
         <v-spacer></v-spacer>
 
         <v-col align-self="end">
-          <CreateNewCategory />
+          <CreateOrEditCategory />
         </v-col>
         
       </v-row>
@@ -24,7 +24,7 @@
               <td>{{row.item.description}}</td>
               <td>{{row.item.type}}</td>
               <td>
-                <EditNewCategory :category=row.item />
+                <CreateOrEditCategory :editingCategory=row.item />
               </td>
               <td>
                 <v-btn variant="outlined" @click="deleteCategory(row.item.id)">
@@ -42,8 +42,7 @@
 <script setup>
   import { onMounted, ref } from 'vue';
   import { getUri } from '../utils/utils'; // Adjust the path as necessary
-  import CreateNewCategory from '../components/CreateNewCategory.vue';
-  import EditNewCategory from '../components/EditCategory.vue';
+  import CreateOrEditCategory from '../components/CreateOrEditCategory.vue';
   import { useAuth0 } from '@auth0/auth0-vue';
 
   const { getAccessTokenSilently } = useAuth0();

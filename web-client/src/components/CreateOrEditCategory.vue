@@ -3,13 +3,13 @@
     <v-dialog v-model="dialog" persistent width="512">
       <template v-slot:activator="{ props }">
         <v-btn variant="outlined" v-bind="props">
-          Create new category
+          {{ isEditMode ? 'Edit category' : 'New category' }}
         </v-btn>
       </template>
 
       <v-card>
         <v-card-title style="margin-top: 10px; margin-left: 10px;">
-          <span class="text-h5">New category</span>
+          <span class="text-h5">{{ isEditMode ? 'Edit category' : 'New category' }}</span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -37,7 +37,8 @@
                 <v-select
                   v-model="categoryType"
                   :items="categoryTypes"
-                  label="Type"
+                  label="Type*"
+                  required
                 ></v-select>
               </v-col>
             </v-row>
@@ -47,18 +48,18 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-            color="blue-darken-1"
-            variant="text"
+            color="blue darken-1"
+            text
             @click="dialog = false"
           >
             Close
           </v-btn>
           <v-btn
-            color="blue-darken-1"
-            variant="text"
-            @click="addCategory"
+            color="blue darken-1"
+            text
+            @click="addOrUpdateCategory"
           >
-            Add
+            {{ isEditMode ? 'Update' : 'Add' }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -67,20 +68,34 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useAuth0 } from '@auth0/auth0-vue';
 import { getUri } from '../utils/utils';
 
 export default {
-  setup() {
+  props: {
+    editingCategory: Object, // The category to edit
+  },
+  setup(props) {
     const dialog = ref(false);
     const categoryName = ref('');
     const categoryDescription = ref('');
     const categoryType = ref(null);
-    const categoryTypes = ref(['expense', 'income']); // Adjust as per your requirements
+    const categoryTypes = ref(['expense', 'income']);
+    const isEditMode = ref(false);
     const { getAccessTokenSilently } = useAuth0();
 
-    const addCategory = async () => {
+    watch(() => props.editingCategory, (newVal) => {
+      if (newVal) {
+        categoryName.value = newVal.name;
+        categoryDescription.value = newVal.description;
+        categoryType.value = newVal.type;
+        isEditMode.value = true;
+        // dialog.value = true;
+      }
+    }, { immediate: true });
+
+    const addOrUpdateCategory = async () => {
       if (!categoryName.value) {
         alert('Please enter a category name');
         return;
@@ -93,30 +108,31 @@ export default {
           Authorization: `Bearer ${token}`
         };
 
-        const newCategory = {
+        const categoryData = {
           name: categoryName.value,
           description: categoryDescription.value,
           type: categoryType.value,
         };
 
-        const response = await fetch(getUri('/category'), {
-          method: 'POST',
+        const url = isEditMode.value ? getUri(`/category/${props.editingCategory.id}`) : getUri('/category');
+        const method = isEditMode.value ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
           headers,
-          body: JSON.stringify(newCategory),
+          body: JSON.stringify(categoryData),
         });
 
         if (!response.ok) {
           throw new Error('Failed to add category');
         }
 
-        // Handle response here, e.g., refresh category list, show success message
-        console.log('Category added successfully');
+        console.log('Category added/updated successfully');
         location.reload();
         dialog.value = false;
         resetFields();
       } catch (error) {
-        console.error('Error adding category:', error);
-        // Handle error here, e.g., show error message to user
+        console.error('Error adding/updating category:', error);
       }
     };
 
@@ -124,6 +140,7 @@ export default {
       categoryName.value = '';
       categoryDescription.value = '';
       categoryType.value = null;
+      isEditMode.value = false;
     };
 
     return {
@@ -132,7 +149,8 @@ export default {
       categoryDescription,
       categoryType,
       categoryTypes,
-      addCategory,
+      addOrUpdateCategory,
+      isEditMode
     };
   },
 }
