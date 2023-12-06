@@ -1,6 +1,6 @@
 import { getTypeString } from "../utils/transaction_type_utils.js";
 
-export const aggregateTransactionsByCategory = (transactions: Array<any>, transactionType: string) => {
+const aggregateTransactionsByCategory = (transactions: Array<any>, transactionType: string) => {
     return transactions.reduce((acc, transaction) => {
         // Filter transactions by the specified type
         if (getTypeString(transaction.type) !== transactionType) {
@@ -19,3 +19,11 @@ export const aggregateTransactionsByCategory = (transactions: Array<any>, transa
         return acc;
     }, {});
 };
+
+export const aggregateIncomesByCategory = (transactions: Array<any>) => {
+    return aggregateTransactionsByCategory(transactions)('income');
+};
+
+export const aggregateExpensesByCategory = (transactions: Array<any>) => {
+    return aggregateTransactionsByCategory(transactions)('expense');
+}
