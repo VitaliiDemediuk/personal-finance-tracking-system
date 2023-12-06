@@ -38,23 +38,30 @@
 </template>
   
 <script setup>
-import CreateNewCategory from '../components/CreateNewCategory.vue'
-import EditNewCategory from '../components/EditCategory.vue'
+import { onMounted, ref } from 'vue';
+import { getAuthHeader, getUri } from '../utils/utils'; // Adjust the path as necessary
+import CreateNewCategory from '../components/CreateNewCategory.vue';
+import EditNewCategory from '../components/EditCategory.vue';
 
-const items = [
-    {
-      name: 'Розваги',
-      description: 'Розваги Розваги Розваги Розваги Розваги Розваги',
-    },
-    {
-      name: 'Розваги',
-      description: 'Розваги Розваги Розваги Розваги Розваги Розваги',
-    },
-    {
-      name: 'Розваги',
-      description: 'Розваги Розваги Розваги Розваги Розваги Розваги',
+const items = ref([]);
+
+const fetchCategories = async () => {
+    try {
+        const headers = await getAuthHeader();
+        const response = await fetch(getUri('/category/all'), { headers });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch categories');
+        }
+
+        items.value = await response.json();
+    } catch (error) {
+        console.error('There was an error fetching the categories:', error);
     }
-    // ... more items
-  ]
+};
+
+onMounted(() => {
+    fetchCategories();
+});
 </script>
   
