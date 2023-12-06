@@ -41,7 +41,7 @@
 
 <script setup>
   import { onMounted, ref } from 'vue';
-  import { getAuthHeader, getUri } from '../utils/utils'; // Adjust the path as necessary
+  import { getUri } from '../utils/utils'; // Adjust the path as necessary
   import CreateNewCategory from '../components/CreateNewCategory.vue';
   import EditNewCategory from '../components/EditCategory.vue';
   import { useAuth0 } from '@auth0/auth0-vue';
