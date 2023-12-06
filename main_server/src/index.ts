@@ -31,10 +31,10 @@ const formatApiResponse = (data: any) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formatObject = (obj: any) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { user_id, type, amount, totalAmount, ...rest } = obj;
+        const { user_id, type, amount, ...rest } = obj;
         return Object.fromEntries(
-            Object.entries({ ...rest, type: getTypeString(type), amount: amount / 100, totalAmount: totalAmount / 100 })
-                .filter(([_, value]) => value !== null)
+            Object.entries({ ...rest, type: getTypeString(type), amount: amount / 100})
+                .filter(([_, value]) => !Number.isNaN(value) && value !== null)
         );
     };
 

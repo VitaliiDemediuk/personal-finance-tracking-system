@@ -3,7 +3,7 @@
 import { useAuth0 } from '@auth0/auth0-vue';
 
 export const getUri = (urn) => {
-    return `http;//localhost:8081${urn}`;
+    return `http://localhost:8081${urn}`;
 }
 
 export const getAuthHeader = async () => {
