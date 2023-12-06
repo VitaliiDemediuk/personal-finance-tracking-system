@@ -37,8 +37,7 @@ export const aggregateTransactionsByCategory = (transactions: Array<any>, transa
     }, {});
 };
 
-
-export const getUserId = (auth: AuthResult | undefined) => {
+export const extractUserIdFromAuthInfo = (auth: AuthResult | undefined) => {
     if (auth === undefined) {
         throw new Error('Auth is undefined');
     }
