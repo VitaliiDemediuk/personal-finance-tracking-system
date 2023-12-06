@@ -4,9 +4,11 @@ export const typesInt: {[key: string]: number} = {
 };
 
 export const getTypeString = (typeInt: number) => {
-    const typesStr: { [key: number]: string } = {
-        0: 'expense',
-        1: 'income',
-    };
+    switch (typeInt) {
+        case typesInt.expense:
+            return 'expense';
+        case typesInt.income:
+            return 'income';
+    }
     return typesStr[typeInt] || 'unknown';
 };
