@@ -265,6 +265,19 @@ transactionRouter.put('/:id', checkJwt, async (request, response) => {
     }
 });
 
+transactionRouter.delete('/:id', checkJwt, async (request, response) => {
+    try {
+        const userId = getUserId(request.auth);
+
+        const id = parseInt(request.params.id);
+        await prisma.transaction.delete({
+            where: { id: id, user_id: userId },
+        });
+        response.send();
+    } catch (error) {
+        handleError(error, response);
+    }
+});
 
 app.use('/category', categoryRouter);
 app.use('/transaction', transactionRouter);
