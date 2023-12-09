@@ -12,10 +12,10 @@
   "scripts": {
     "dev": "npx nodemon",
     "build": "rimraf build && npx tsc",
-    "start": "npm run test && node build/index",
+    "start": "npm run unit_tests && node build/src/index",
     "lint": "npx eslint ./src",
     "format": "npx eslint ./src --fix",
-    "unit_test": "npm run build && mocha build/unit_tests/**/*.js",
+    "unit_tests": "npm run build && mocha build/unit_tests/**/*.js",
     "integration_tests": "npm run build && mocha build/integration_tests/**/*.js"
   },
   "keywords": [],
