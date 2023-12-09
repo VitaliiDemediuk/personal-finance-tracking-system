@@ -50,13 +50,15 @@ transactionRouter.post('', checkJwt, async (request, response) => {
             return response.status(400).send('Invalid transaction type');
         }
 
-        // Fetch the category to validate the type
-        const category = await prisma.category.findUnique({
-            where: { id: categoryId, user_id: userId }
-        });
+        // Fetch the category to validate the type only if categoryId is provided
+        if (categoryId) {
+            const category = await prisma.category.findUnique({
+                where: { id: categoryId, user_id: userId }
+            });
 
-        if (!category || category.type !== convertedType) {
-            return response.status(400).send('Transaction type does not match category type');
+            if (!category || category.type !== convertedType) {
+                return response.status(400).send('Transaction type does not match category type');
+            }
         }
 
         const transaction = await prisma.transaction.create({
@@ -65,7 +67,7 @@ transactionRouter.post('', checkJwt, async (request, response) => {
                 type: convertedType,
                 date: new Date(), // Set the current date
                 description,
-                categoryId,
+                categoryId: categoryId || null, // Allow null categoryId
                 user_id: userId
             },
         });
