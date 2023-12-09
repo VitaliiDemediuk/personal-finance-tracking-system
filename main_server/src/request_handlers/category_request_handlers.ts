@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { checkJwt } from '../utils/auth_middleware.js';
 import { typesInt } from "../utils/transaction_type_utils.js";
-import { handleError, getUserId, formatApiResponse } from "../utils/request_handler_utils.js";
+import { handleError, extractUserIdFromAuthInfo, formatApiResponse } from "../utils/request_handler_utils.js";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +12,7 @@ export const categoryRouter = Router();
 // GET: Read all categories
 categoryRouter.get('/all', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const categories = await prisma.category.findMany( {where: { user_id: userId }});
         response.json(formatApiResponse(categories));
@@ -24,7 +24,7 @@ categoryRouter.get('/all', checkJwt, async (request, response) => {
 // GET: Read a single category by ID
 categoryRouter.get('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         const category = await prisma.category.findUnique({
@@ -43,7 +43,7 @@ categoryRouter.get('/:id', checkJwt, async (request, response) => {
 // POST: Create a new category
 categoryRouter.post('', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const { name, description, type } = request.body;
         // Convert type string to its corresponding integer
@@ -65,7 +65,7 @@ categoryRouter.post('', checkJwt, async (request, response) => {
 // PUT: Update a category
 categoryRouter.put('/:id', checkJwt, async (request, response) => {
 try {
-    const userId = getUserId(request.auth);
+    const userId = extractUserIdFromAuthInfo(request.auth);
 
     const id = parseInt(request.params.id);
     const { name, description } = request.body;
@@ -82,7 +82,7 @@ try {
 // DELETE: Delete a category
 categoryRouter.delete('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         await prisma.category.delete({

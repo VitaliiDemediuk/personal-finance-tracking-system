@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { checkJwt } from '../utils/auth_middleware.js';
 import { typesInt, getTypeString } from "../utils/transaction_type_utils.js";
-import { handleError, getUserId, formatApiResponse } from "../utils/request_handler_utils.js";
+import { handleError, extractUserIdFromAuthInfo, formatApiResponse } from "../utils/request_handler_utils.js";
 import { aggregateTransactionsByCategory } from "../algorithms/aggregate_transactions_by_category.js";
 
 const prisma = new PrismaClient();
@@ -12,7 +12,7 @@ export const reportRouter = Router();
 
 reportRouter.get('/all', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const reports = await prisma.report.findMany({
             where: { user_id: userId }
@@ -25,7 +25,7 @@ reportRouter.get('/all', checkJwt, async (request, response) => {
 
 reportRouter.get('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         const report = await prisma.report.findUnique({
@@ -44,7 +44,7 @@ reportRouter.get('/:id', checkJwt, async (request, response) => {
 
 reportRouter.post('', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
         const { name, periodStart, periodEnd, type } = request.body;
 
         const convertedType = typesInt[type];
@@ -76,7 +76,7 @@ reportRouter.post('', checkJwt, async (request, response) => {
 
 reportRouter.put('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         const { name, periodStart, periodEnd, type } = request.body;
@@ -109,7 +109,7 @@ reportRouter.put('/:id', checkJwt, async (request, response) => {
 
 reportRouter.delete('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         await prisma.report.delete({
@@ -123,7 +123,7 @@ reportRouter.delete('/:id', checkJwt, async (request, response) => {
 
 reportRouter.get('/build/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
         const reportId = parseInt(request.params.id);
 
         // Fetch the report details
@@ -150,7 +150,7 @@ reportRouter.get('/build/:id', checkJwt, async (request, response) => {
         });
 
         // Aggregate the transactions by category
-        const aggregatedData = aggregateTransactionsByCategory(transactions, getTypeString(report.type));
+        const aggregatedData = aggregateTransactionsByCategory(getTypeString(report.type))(transactions);
         response.json(aggregatedData);
     } catch (error) {
         handleError(error, response);

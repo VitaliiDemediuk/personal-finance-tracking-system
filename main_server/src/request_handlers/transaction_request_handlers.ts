@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { checkJwt } from '../utils/auth_middleware.js';
 import { typesInt } from "../utils/transaction_type_utils.js";
-import { handleError, getUserId, formatApiResponse } from "../utils/request_handler_utils.js";
+import { handleError, extractUserIdFromAuthInfo, formatApiResponse } from "../utils/request_handler_utils.js";
 
 const prisma = new PrismaClient();
 
@@ -11,7 +11,7 @@ export const transactionRouter = Router();
 
 transactionRouter.get('/all', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const transactions = await prisma.transaction.findMany({
             where: { user_id: userId }
@@ -24,7 +24,7 @@ transactionRouter.get('/all', checkJwt, async (request, response) => {
 
 transactionRouter.get('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         const transaction = await prisma.transaction.findUnique({
@@ -42,7 +42,7 @@ transactionRouter.get('/:id', checkJwt, async (request, response) => {
 
 transactionRouter.post('', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const { amount, type, description, categoryId } = request.body;
         const convertedType = typesInt[type];
@@ -77,7 +77,7 @@ transactionRouter.post('', checkJwt, async (request, response) => {
 
 transactionRouter.put('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         const { amount, description, categoryId } = request.body;
@@ -116,7 +116,7 @@ transactionRouter.put('/:id', checkJwt, async (request, response) => {
 
 transactionRouter.delete('/:id', checkJwt, async (request, response) => {
     try {
-        const userId = getUserId(request.auth);
+        const userId = extractUserIdFromAuthInfo(request.auth);
 
         const id = parseInt(request.params.id);
         await prisma.transaction.delete({
