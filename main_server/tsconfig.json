@@ -108,7 +108,7 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*", "unit_tests/**/*"],
+  "include": ["src/**/*", "unit_tests/**/*", "integration_tests/**/*"],
   "exclude": ["node_modules"],
   "lib": ["esnext"],
   "ts-node": {

@@ -1,5 +1,3 @@
-import { getTypeString } from "../utils/transaction_type_utils.js";
-
 export const aggregateTransactionsByCategory = (transactionType: string) => (transactions: Array<any>) => {
     return transactions.reduce((acc, transaction) => {
         // Filter transactions by the specified type
