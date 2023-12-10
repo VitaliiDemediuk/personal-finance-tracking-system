@@ -148,9 +148,16 @@ reportRouter.get('/build/:id', checkJwt, async (request, response) => {
                 },
             }
         });
+        
+        const mappedTransactions = transactions.map(transaction => ({ 
+            ...transaction, 
+            type: getTypeString(transaction.type),
+        }));
 
         // Aggregate the transactions by category
-        const aggregatedData = aggregateTransactionsByCategory(getTypeString(report.type))(transactions);
+        const aggregatedData = aggregateTransactionsByCategory(getTypeString(report.type))(mappedTransactions);
+
+
         response.json(aggregatedData);
     } catch (error) {
         handleError(error, response);
