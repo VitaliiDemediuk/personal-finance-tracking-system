@@ -24,6 +24,11 @@ export function createRouter(app) {
         component: () => import('@/views/Transactions.vue'),
         beforeEnter: createAuthGuard(app)
       },
+      {
+        path: '/reports',
+        component: () => import('@/views/Reports.vue'),
+        beforeEnter: createAuthGuard(app)
+      },
     ],
     history: createWebHashHistory()
   })
