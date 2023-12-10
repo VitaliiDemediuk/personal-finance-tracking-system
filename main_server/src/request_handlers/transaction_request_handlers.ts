@@ -93,12 +93,14 @@ transactionRouter.put('/:id', checkJwt, async (request, response) => {
             return response.status(404).send('Transaction not found');
         }
 
-        const category = await prisma.category.findUnique({
-            where: { id: categoryId, user_id: userId }
-        });
+        if (categoryId) {
+            const category = await prisma.category.findUnique({
+                where: { id: categoryId, user_id: userId }
+            });
 
-        if (!category || category.type !== existingTransaction.type) {
-            return response.status(400).send('Transaction type does not match category type');
+            if (!category || category.type !== existingTransaction.type) {
+                return response.status(400).send('Transaction type does not match category type');
+            }
         }
 
         const transaction = await prisma.transaction.update({
